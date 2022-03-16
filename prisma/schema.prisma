@@ -1,0 +1,63 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model products {
+  id Int @id @default(autoincrement()) @unique
+  name String
+  slug String @unique
+  category String
+  image String
+  isFeatured Boolean @default(false)
+  featuredImage String?
+  price Float
+  brand String?
+  rating Float?
+  numReviews Int @default(0)
+  countInStock Int
+  description String
+  createdAt String?
+}
+
+model users {
+  id Int @id @default(autoincrement()) @unique
+  username String @unique
+  email String  @unique
+  password String
+  createdAt String?
+  updatedAt String?
+  isAdmin Boolean @default(false)
+}
+
+model orders {
+  id Int @id @default(autoincrement()) @unique
+  username String
+  orderItems Json[]
+  shippingAddress Json
+  paymentMethod String
+  itemsPrice Float
+  shippingPrice Float
+  taxPrice Float
+  totalPrice Float
+  isPaid Boolean @default(false)
+  isDelivered Boolean @default(false)
+  createdAt String
+  paidAt String?
+  deliveredAt String?
+}
+
+model reviews {
+  id Int @id @default(autoincrement()) @unique
+  createdAt String?
+  createdBy String
+  slug String
+  rating Float
+  comment String
+}

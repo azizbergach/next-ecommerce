@@ -1,0 +1,41 @@
+import nextConnect from 'next-connect';
+import { isAuth, isAdmin } from '../../../utils/auth';
+import { onError } from '../../../utils/error';
+import multer from 'multer';
+import { v2 as cloudinary } from 'cloudinary';
+import streamifier from 'streamifier';
+
+cloudinary.config({
+  cloud_name: 'ds0kvy8vq',
+  api_key: '925661487789556',
+  api_secret: 'Vtyim6DXIP23cwNZbmJ-FPvE46s',
+});
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+const handler = nextConnect({ onError });
+const upload = multer();
+
+handler.use(isAuth, isAdmin, upload.single('file')).post(async (req, res) => {
+  const streamUpload = (req) => {
+    // eslint-disable-next-line no-undef
+    return new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream((error, result) => {
+        if (result) {
+          resolve(result);
+        } else {
+          reject(error);
+        }
+      });
+      streamifier.createReadStream(req.file.buffer).pipe(stream);
+    });
+  };
+  const result = await streamUpload(req);
+  res.send(result);
+});
+
+export default handler;
